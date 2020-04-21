@@ -14,7 +14,7 @@
 - Création du document word pour la documentation
 - Création d'un modèle de base de données
 
-![database v1](/Documentation/Bdd/v1.SVG)
+![database v1](/Documentation/Bdd/v1.svg)
 
 ## 07.04.2020
 - Création des maquettes
