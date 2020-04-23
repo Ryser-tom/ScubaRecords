@@ -29,6 +29,12 @@ Route::post('club', 'ClubController@store');
 Route::put('club/{club}', 'ClubController@update');
 Route::delete('club/{club}', 'ClubController@delete');
 
+/*
+|--------------------------------------------------------------------------
+| Certification Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::get('cert', 'CertificationController@index');
 Route::get('cert.last/{user}', 'CertificationController@last');
 Route::post('cert', 'CertificationController@store');
