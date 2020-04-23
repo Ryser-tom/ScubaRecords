@@ -1,0 +1,403 @@
+{
+	"info": {
+		"_postman_id": "da244456-4025-4a68-82c1-72a2ed80cbc4",
+		"name": "ScubaRecords",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "club",
+			"item": [
+				{
+					"name": "store",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8728847-7974-4797-9666-47ca929e7f1f",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"Name\": \"CSaq\",\r\n        \"Description\": \"Ce ci est la description du Club de plongée subaquatic d'Onex.\",\r\n        \"Location\": 1,\r\n        \"CreatedBy\": 1,\r\n        \"Master\": 1,\r\n        \"StartDateTime\": \"2020-04-08 13:17:21\",\r\n        \"EndDateTime\": null\r\n\t\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://scubarecords.test/api/club",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"club"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8b131adb-c6f2-4033-a245-68f75e158dea",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://scubarecords.test/api/club",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"club"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1f1385be-fc2f-4ceb-ab04-0a888213eaab",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://scubarecords.test/api/club/3",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"club",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a26b0e91-fec8-4f6b-8a81-f60dcee25c56",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Name\": \"CSAsdfgsdfQ\",\r\n    \"Description\": \"Ce ci est la description du Club de plongée subaquatic d'Onex. Et je viens de modifier le nom du club.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://scubarecords.test/api/club/2",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"club",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7bbc8d38-c72e-4a62-a990-aab90c46e53c",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://scubarecords.test/api/club/2",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"club",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "certification",
+			"item": [
+				{
+					"name": "store",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6b29e201-0cf0-4138-9cf0-880a2d1ff702",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"CMAS **\",\r\n    \"date\": \"2019-08-14 13:23:08\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://scubarecords.test/api/cert",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"cert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8b131adb-c6f2-4033-a245-68f75e158dea",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://scubarecords.test/api/cert",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"cert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get last",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1f1385be-fc2f-4ceb-ab04-0a888213eaab",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://scubarecords.test/api/cert.last",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"cert.last"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7351457e-b340-441e-b97b-2ce363b6d2de",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Name\": \"CSAQ\",\r\n    \"Description\": \"Ce ci est la description du Club de plongée subaquatic d'Onex. Et je viens de modifier le nom du club.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://scubarecords.test/api/cert/2",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"cert",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7b64469d-a964-45e3-9e3e-389be0ffe718",
+								"exec": [
+									"pm.test(\"Status test\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://scubarecords.test/api/cert/2",
+							"protocol": "http",
+							"host": [
+								"scubarecords",
+								"test"
+							],
+							"path": [
+								"api",
+								"cert",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

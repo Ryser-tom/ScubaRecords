@@ -14,7 +14,6 @@ class CertificationController extends Controller
  
     public function lastOfUser($user)
     {
-        $
         return Certification::find($user);
     }
 

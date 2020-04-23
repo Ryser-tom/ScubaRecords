@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 /*
 |--------------------------------------------------------------------------
 | Club Routes
@@ -32,10 +33,23 @@ Route::delete('club/{club}', 'ClubController@delete');
 /*
 |--------------------------------------------------------------------------
 | Certification Routes
+| not finished
 |--------------------------------------------------------------------------
 */
 
 Route::get('cert', 'CertificationController@index');
-Route::get('cert.last/{user}', 'CertificationController@last');
+Route::get('cert/{user}', 'CertificationController@lastOfUser');
 Route::post('cert', 'CertificationController@store');
 Route::delete('cert/{cert}', 'CertificationController@delete');
+
+/*
+|--------------------------------------------------------------------------
+| Event Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('event', 'EventController@index');
+Route::get('event/{event}', 'EventController@show');
+Route::post('event', 'EventController@store');
+Route::put('event/{event}', 'EventController@update');
+Route::delete('event/{event}', 'EventController@delete');
