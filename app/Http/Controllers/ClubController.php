@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Club;
+use App\User;
+use DB;
 
 class ClubController extends Controller
 {
@@ -36,5 +38,25 @@ class ClubController extends Controller
         $club->delete();
 
         return response()->json(null, 204);
+    }
+
+    /*
+        SELECT users.idUser, users.firstName, users.lastName FROM scubarecords.users 
+        INNER JOIN scubarecords.members ON members.idUser = users.idUser
+        INNER JOIN scubarecords.clubs ON members.idClub = clubs.idClub
+
+        
+            
+    */
+    public function getMembers($club)
+    {
+        $members = DB::table('clubs')
+        ->join('members', 'members.idClub', '=', 'clubs.idClub')
+        ->join('users', 'members.idUser', '=', 'users.idUser')
+        ->select('users.idUser', 'users.firstName', 'users.lastName', 'clubs.name')
+        ->where('clubs.idClub', $club)
+        ->get();
+
+        return $members->toJson(JSON_PRETTY_PRINT);
     }
 }

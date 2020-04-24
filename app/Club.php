@@ -6,17 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Club extends Model
 {
-    protected $table = 'club';
+    protected $table = 'clubs';
     protected $primaryKey = 'idClub';
     public $timestamps = false;
     protected $fillable = [
         'idClub',
-        'Name',
-        'Description',
-        'Location',
-        'CreatedBy',
-        'Master',
-        'StartDateTime',
-        'EndDateTime'
+        'name',
+        'description',
+        'location',
+        'createdBy',
+        'master',
+        'startDateTime',
+        'endDateTime'
     ];
 }

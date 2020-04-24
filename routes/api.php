@@ -13,10 +13,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+/*
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+*/
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,20 @@ Route::get('club/{club}', 'ClubController@show');
 Route::post('club', 'ClubController@store');
 Route::put('club/{club}', 'ClubController@update');
 Route::delete('club/{club}', 'ClubController@delete');
+Route::get('members/{club}', 'ClubController@getMembers');
+
+/*
+|--------------------------------------------------------------------------
+| User Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('user', 'UserController@index');
+//Route::get('user/{user}', 'UserController@show');
+//Route::post('user', 'UserController@store');
+//Route::put('user/{user}', 'UserController@update');
+//Route::delete('user/{user}', 'UserController@delete');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +60,7 @@ Route::delete('cert/{cert}', 'CertificationController@delete');
 /*
 |--------------------------------------------------------------------------
 | Event Routes
+| not tested
 |--------------------------------------------------------------------------
 */
 

@@ -47,7 +47,11 @@
   "Warning: require(C:\laragon\www\ScubaRecords-master\public/../vendor/autoload.php): failed to open stream: No such file or directory in C:\laragon\www\ScubaRecords-master\public\index.php on line 24
 
   Fatal error: require(): Failed opening required 'C:\laragon\www\ScubaRecords-master\public/../vendor/autoload.php' (include_path='.;C:/laragon/etc/php/pear') in C:\laragon\www\ScubaRecords-master\public\index.php on line 24" 
-  - J'ai exécuter les commandes "composer install", "npm install", "copy .en.example .env" et "php artisan key:generate"
+  - J'ai exécuter les commandes "composer install", ~~"npm install"~~, "copy .en.example .env" et "php artisan key:generate"
+  - J'ai modifier le .env.example pour que l'importation soit plus simple
 
-- 
+## 24.04.2020
+  - création d'un seeder pour l'utilisateur
+    - erreur Call to undefined function str_random()
+      - $ composer require laravel/helpers
      
