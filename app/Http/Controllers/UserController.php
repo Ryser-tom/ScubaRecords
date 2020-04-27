@@ -41,18 +41,6 @@ class UserController extends Controller
         return response()->json(null, 204);
     }
 
-    /*
-        SELECT users.idUser, users.firstName, users.lastName FROM scubarecords.users 
-        INNER JOIN scubarecords.members ON members.idUser = users.idUser
-        INNER JOIN scubarecords.clubs ON members.idClub = clubs.idClub
-
-        $members = DB::table('users')
-        ->join('members', 'members.idUser', '=', 'users.idUser')
-        ->join('clubs', 'members.idClub', '=', 'clubs.idClub')
-            ->select('users.idUser', 'users.firstName', 'users.lastName')
-            ->get();
-            
-    */
     public function getMembers($club)
     {
         $members = DB::table('users')
@@ -61,7 +49,7 @@ class UserController extends Controller
         ->select('users.idUser', 'users.firstName', 'users.lastName', 'clubs.name')
         ->where('clubs.idClub', $club)
         ->get();
-
+        
         return $members->toJson(JSON_PRETTY_PRINT);
     }
 }
