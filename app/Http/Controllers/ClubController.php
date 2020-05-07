@@ -1,5 +1,13 @@
 <?php
 
+/*******************************************************************************
+AUTEUR      : Tom Ryser
+LIEU        : CFPT Informatique Genève
+DATE        : Avril 2020
+TITRE PROJET: ScubaRecords
+VERSION     : 1.0
+*******************************************************************************/
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -17,7 +25,9 @@ class ClubController extends Controller
  
     public function show($club)
     {
-        return Club::find($club);
+        $club = Club::find($club)->toJson();
+
+        return view('profile')->with( 'info', json_decode($club, true));
     }
 
     public function store(Request $request)

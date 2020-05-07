@@ -1,5 +1,13 @@
 <?php
 
+/*******************************************************************************
+AUTEUR      : Tom Ryser
+LIEU        : CFPT Informatique Genève
+DATE        : Avril 2020
+TITRE PROJET: ScubaRecords
+VERSION     : 1.0
+*******************************************************************************/
+
 namespace App;
 
 //use Illuminate\Database\Eloquent\Model;
@@ -30,6 +38,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'smallDesc',
+        'description',
+        'phone',
         'api_token'
     ];
 
@@ -39,15 +50,6 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
+        'password', 'remember_token', 'api_token'
     ];
 }

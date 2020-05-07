@@ -1,5 +1,13 @@
 <?php
 
+/*******************************************************************************
+AUTEUR      : Tom Ryser
+LIEU        : CFPT Informatique Genève
+DATE        : Avril 2020
+TITRE PROJET: ScubaRecords
+VERSION     : 1.0
+*******************************************************************************/
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -83,4 +91,4 @@ Route::post('dives', 'DiveController@store');
 //Route::put('dives/{user}', 'DiveController@update');
 //Route::delete('dives/{user}', 'DiveController@delete');
 
-Route::get('dives/test', 'DiveController@test');
+Route::get('dives/test/{diveId}', 'DiveController@test');

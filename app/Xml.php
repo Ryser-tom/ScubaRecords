@@ -12,21 +12,15 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DiveSite extends Model
+class Xml extends Model
 {
-    protected $table = 'diveSites';
-    protected $primaryKey = 'idDiveSite';
-    public $timestamps = false;
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-        'idDiveSite',
-        'name',
-        'boat',
-        'weather',
-        'weight',
-        'description',
-        'location',
-        'pressionInit',
-        'diver',
-        'public'
+        'title',
+        'path'
     ];
 }
