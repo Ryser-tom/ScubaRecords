@@ -1,3 +1,11 @@
+<!--******************************************************************************
+AUTEUR      : Tom Ryser
+LIEU        : CFPT Informatique Genève
+DATE        : Avril 2020
+TITRE PROJET: ScubaRecords
+VERSION     : 1.0
+******************************************************************************-->
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>

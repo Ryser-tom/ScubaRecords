@@ -1,3 +1,11 @@
+<!--******************************************************************************
+AUTEUR      : Tom Ryser
+LIEU        : CFPT Informatique Genève
+DATE        : Avril 2020
+TITRE PROJET: ScubaRecords
+VERSION     : 1.0
+******************************************************************************-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +16,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
-    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700" rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/d212a1f367.js" crossorigin="anonymous"></script>    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700" rel='stylesheet' type='text/css'>
 
     <!-- Styles -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
@@ -46,6 +53,51 @@
             <div class="collapse navbar-collapse" id="app-navbar-collapse">
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
+                    <!-- Logbook -->
+                    @if (Auth::check())
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Carnet de plongée
+                            </a>
+                            <div class="dropdown">
+                                <ul class="dropdown-menu">
+                                    <li><a href="{{ url('dives/personnal') }}">Mes plongées</a></li>
+                                    <li><a href="{{ url('dives/public') }}">Plongées public</a></li>
+                                    <li><a href="{{ url('dives/follow') }}">Plongées de mes abonnements</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">Ajouter une plongée</a></li>
+                                    <li><a href="{{ url('importDive')}}">uploader une plongée</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Carnet de plongée</a>
+                    </li>
+                    @endif
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Carte du monde</a>
+                    </li>
+                    <!-- Club -->
+                    @if (Auth::check())
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Clubs
+                            </a>
+                            <div class="dropdown">
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Mes clubs</a></li>
+                                    <li><a href="#">tout les clubs</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">Créer un club</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Clubs</a>
+                    </li>
+                    @endif
                 </ul>
 
                 <!-- Right Side Of Navbar -->
@@ -61,6 +113,7 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
+                                <li><a href="/user/{{ Auth::user()->name }}"><i class="fa fa-btn fa fa-user"></i>Profil</a></li>
                                 <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
                             </ul>
                         </li>
@@ -74,7 +127,7 @@
 
     <!-- JavaScripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
     {{-- <script src="{{ elixir('js/app.js') }}"></script> --}}
 </body>
 </html>
