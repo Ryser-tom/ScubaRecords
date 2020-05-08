@@ -94,4 +94,8 @@
 ## 07.05.2020
  - Rédaction de l'analyse de l'existant
  - Ajout de Laragon et VSCode dans l'environnement
+
+## 08.05.2020
+ - Je ne sais pas pourquoi mais lorsque j'essaie de faire un concat (sql) dans la table following il ne fonctionne pas
+   - j'ai confondu concat() avec group_concat()
  - 
