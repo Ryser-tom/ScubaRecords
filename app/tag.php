@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tag extends Model
 {
-    protected $table = 'tag';
+    protected $table = 'tags';
     protected $primaryKey = 'idTag';
     public $timestamps = false;
     protected $fillable = [

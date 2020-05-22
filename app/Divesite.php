@@ -20,13 +20,11 @@ class DiveSite extends Model
     protected $fillable = [
         'idDiveSite',
         'name',
-        'boat',
-        'weather',
-        'weight',
         'description',
-        'location',
-        'pressionInit',
-        'diver',
-        'public'
+        'difficulty',
+        'depthMin',
+        'depthMax',
+        'latitude',
+        'longitude'
     ];
 }

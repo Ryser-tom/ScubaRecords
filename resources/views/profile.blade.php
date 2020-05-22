@@ -61,7 +61,7 @@ VERSION     : 1.0
 		}
 	</style>
 	@php
-		xdebug_break();
+		//xdebug_break();
 	@endphp
     <div class="main main-raised">
 		<div class="profile-content">
@@ -72,6 +72,18 @@ VERSION     : 1.0
 				<div class="row">
 					<!-- TODO: correct the binome -->
 					<div id="left-infos" class="col-sm-3"> 
+						@if($info['idUser'] != Auth::user()->idUser )
+						<form action="/follow" method="post">
+							{{csrf_field()}}
+							{{ Form::hidden('followed', $info['idUser']) }}
+							{{ Form::hidden('name', $info['name']) }}
+							@if($info['followed'])
+								<button class="btn btn-danger" type="submit">Ne plus suivre</button>
+							@else
+								<button class="btn btn-success" type="submit">Suivre</button>
+							@endif
+						</form>
+						@endif
 						@if(isset($info['phone'])) 
 							<p><i class="fas fa-phone" aria-hidden="true"></i>
 							{{$info['phone']}}</p>
@@ -119,4 +131,31 @@ VERSION     : 1.0
 					</div>
 				</div>
             </div>
+			<script>
+				$(document).ready(function() { 
+					$("#btn-follow").click(function() { 
+						$.ajaxSetup({ 
+							headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')} 
+						});
+						$.ajax({
+							type: 'POST', url: '/tasks', data: {
+								task: $("#frmAddTask input[name=task]").val(),
+								description: $("#frmAddTask input[name=description]").val(),
+							},
+							dataType: 'json', success: function(data) { 
+								$('#frmAddTask').trigger("reset");
+								$("#frmAddTask .close").click(); 
+								window.location.reload(); 
+							}, 
+							error: function(data) { 
+								var errors = $.parseJSON(data.responseText); 
+								$('#add-task-errors').html(''); 
+								$.each(errors.messages, function(key, value) { 
+									$('#add-task-errors').append('<li>' + value + '</li>'); 
+								}); 
+								$("#add-error-bag").show(); 
+							} 
+						}); 
+					});
+			</script>
 @endsection

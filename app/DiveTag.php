@@ -12,10 +12,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Dive_tag extends Model
+class DiveTag extends Model
 {
-    protected $table = 'dive_tag';
-    protected $primaryKey = 'idDive_tag';
+    protected $table = 'dive_tags';
+    protected $primaryKey = 'idDive';
     public $timestamps = false;
     protected $fillable = [
         'idDive',

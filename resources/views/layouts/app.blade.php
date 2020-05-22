@@ -63,7 +63,7 @@ VERSION     : 1.0
                                 <ul class="dropdown-menu">
                                     <li><a href="{{ url('dives/personnal') }}">Mes plongées</a></li>
                                     <li><a href="{{ url('dives/public') }}">Plongées public</a></li>
-                                    <li><a href="{{ url('dives/follow') }}">Plongées de mes abonnements</a></li>
+                                    <li><a href="{{ url('dives/followed') }}">Plongées de mes abonnements</a></li>
                                     <li class="divider"></li>
                                     <li><a href="#">Ajouter une plongée</a></li>
                                     <li><a href="{{ url('importDive')}}">uploader une plongée</a></li>
@@ -76,7 +76,7 @@ VERSION     : 1.0
                     </li>
                     @endif
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Carte du monde</a>
+                        <a class="nav-link" href="{{ url('diveSites/public') }}">Carte du monde</a>
                     </li>
                     <!-- Club -->
                     @if (Auth::check())
@@ -86,8 +86,8 @@ VERSION     : 1.0
                             </a>
                             <div class="dropdown">
                                 <ul class="dropdown-menu">
-                                    <li><a href="#">Mes clubs</a></li>
-                                    <li><a href="#">tout les clubs</a></li>
+                                    <li><a href="{{ url('clubs/my') }}">Mes clubs</a></li>
+                                    <li><a href="{{ url('clubs/all') }}">tout les clubs</a></li>
                                     <li class="divider"></li>
                                     <li><a href="#">Créer un club</a></li>
                                 </ul>

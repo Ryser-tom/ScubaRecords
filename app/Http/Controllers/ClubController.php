@@ -11,6 +11,7 @@ VERSION     : 1.0
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Club;
 use App\User;
 use App\Member;
@@ -20,8 +21,23 @@ class ClubController extends Controller
 {
     public function index()
     {
-        return Club::all();
+        $clubs = Club::all();
+        return view('clubs')->with( 'data', json_decode($clubs, true));
     }
+
+    public function userClubs()
+    {
+        $user = Auth::user();
+
+        $clubs = DB::table('clubs')
+        ->select('*')
+        ->join('members', 'members.idClub', '=', 'clubs.idClub')
+        ->where('members.idUser', $user->idUser)
+        ->get();
+
+        return view('clubs')->with( 'data', json_decode($clubs, true));
+    }
+    
  
     public function show($club)
     {

@@ -30,4 +30,5 @@ class Dive extends Model
         'diver',
         'public'
     ];
+
 }

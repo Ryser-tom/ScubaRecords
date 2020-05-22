@@ -60,70 +60,39 @@ VERSION     : 1.0
 	</style>
 	@php
 		xdebug_break();
-
-		function compare_datetime($a, $b){
-			return strnatcmp(!$a['datetime'], $b['datetime']);
-		}
-		$totalDives = count($data)+1;
-  		uasort($data, 'compare_datetime');
 	@endphp
 	<div class="container">
 		<div class="table-responsive">
-		<!-- TODO: find a way to get the real number of the dive -->
-			@if(Request::is('*/personnal*'))
+			@if(Request::is('*/all'))
 				<table class="table">
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>site de plongée</th>
-							<th>date</th>
-							<th>durée</th>
-							<th>public</th>
-						</tr>
-					</thead>
 					<tbody>
-					@foreach ($data as $dive)
 						<tr>
-							<th scope="row"><a href="../dive/{{$dive['idDive']}}"> {{$totalDives - $loop->iteration}}</a></th>
-							<td>{{$dive["diveSiteName"]}}</td>
-							<td>{{$dive["datetime"]}}</td>
-							<td>{{gmdate("H:i:s", $dive["diveduration"])}}</td>
-							<td>
-								@if ($dive["public"] == 0)
-									<i class="fas fa-check"></i>
-								@else
-									<i class="fas fa-times"></i>
-								@endif
-							</td>
+							<th scope="row" rowspan="2">LOGO</th>
+							<td>Nom du club</td>
+							<td rowspan="2">nombres de membres</td>
 						</tr>
-					@endforeach
+						<tr>
+							<td>motto</td>
+						</tr>
 					</tbody>
 				</table>
-			@elseif (Request::is('*/public*') || Request::is('*/followed') )
+			@elseif (Request::is('*'))
 			<table class="table">
 					<thead>
 						<tr>
-							<th>#</th>
-							<th>plongeur</th>
-							<th>site de plongée</th>
-							<th>date</th>
-							<th>durée</th>
+							<th>nom du club</th>
 						</tr>
 					</thead>
 					<tbody>
-					@foreach ($data as $dive)
+					@foreach ($data as $club)
 						<tr>
-							<th scope="row"><a href="../dive/{{$dive['idDive']}}"> {{$loop->iteration}}</a></th>
-							<td><a href="../../user/{{$dive['username']}}">{{$dive["username"]}}</a></td>
-							<td>{{$dive["diveSiteName"]}}</td>
-							<td>{{$dive["datetime"]}}</td>
-							<td>{{gmdate("H:i:s", $dive["diveduration"])}}</td>
+							<td><a href="../club/{{$club['idClub']}}">{{$club["name"]}}</a></td>
 						</tr>
 					@endforeach
 					</tbody>
 				</table>
 			@else
-				you don't have any records!
+				something went wrong !
 			@endif
 		</div>
 	</div>

@@ -92,10 +92,47 @@
  - après un choix unanime j'ai fait quelque modification et l'ai envoyé à M. Mathieu
   
 ## 07.05.2020
- - Rédaction de l'analyse de l'existant
- - Ajout de Laragon et VSCode dans l'environnement
+  - Rédaction de l'analyse de l'existant
+  - Ajout de Laragon et VSCode dans l'environnement
 
 ## 08.05.2020
- - Je ne sais pas pourquoi mais lorsque j'essaie de faire un concat (sql) dans la table following il ne fonctionne pas
-   - j'ai confondu concat() avec group_concat()
- - 
+  - Je ne sais pas pourquoi mais lorsque j'essaie de faire un concat (sql) dans la table following il ne fonctionne pas
+    - j'ai confondu concat() avec group_concat()
+  - après réflexion je ne pense pas avoir besoin des tables: location, country, languages.
+
+## 11.05.2020- reprise de l'insertion des données depuis un fichier uddf
+
+## 13.05.2020
+  - Les plongées insérée depuis un fichier ne sont pas récupérée pour l'affichage.
+    - j'avais modifier ma base de données, donc je n'utilisait plus la table 'locations'.
+  - j'ai une erreur undefined offset: 0 et il semble que xdebug pose problème.
+    - Pour corriger j'ai du rajouter une clause au where pour que l'utilisateur puisse voir ces plongée privée
+  ```
+  ->where(function($q) use ($user) {
+    $q->where('dives.public', 1)
+    ->orWhere('dives.diver', $user->idUser);
+  ```
+## 14.05.2020
+  - problème pour convertir les "samples" de suunto à uddf
+    - je n'arrive pas à enregistrer les waypoint car lorsque j'essaye de créer un node avec le même nom, il me crée un array.
+    - pour palier à ce problème j'ai créer une fonction de formatage appelée formatXml().
+  - après l'insertion j'ai des valeurs vides dans les dives_tags
+
+## 15.05.2020
+  - création de la map avec leaflet
+    - la map ne s'affiche pas, et j'ai une erreur avec le json parse
+    - il semblerait qu'eloquent retourne un objet javascript (inutile de parse)
+
+## 18.05.2020
+  - modification de la map pour utiliser geoJSON ainsi qu'utiliser le markercluster plugin pour améliorer l'affichage ( https://digital-geography.com/working-with-clusters-in-leaflet-increasing-useability/ )
+
+## 19.05.2020
+  - Form inconnu utiliser {{ Form::hidden('invisible', 'secret') }} (input invisible)
+    - ajout de laravelcollective/html par composer (composer require laravelcollective/html)
+  
+
+## 21.05.2020
+  - Après la modification d'une plongée il semblerait que je perde des "dive_tags"
+    - Impossible de re créer l'erreur.
+  - Erreur lors de la récupération de la date pour le formulaire de modification
+    - Création de $date avec une concaténation des éléments obtenu après l'explode du dateTime.
