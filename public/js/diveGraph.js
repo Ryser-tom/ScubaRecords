@@ -9,7 +9,7 @@ csvData.forEach(d => {
     time = parseFloat(value[0]);//x
     depth = parseFloat(value[1]);//y
     temperature = parseFloat(value[2]) - 273.15;// from K to C°
-    data.push(new CreateData(time, depth, temperature))
+    data.push(new CreateData(time, depth, temperature.toFixed(2)))
 }),
 
 Highcharts.chart('container', {

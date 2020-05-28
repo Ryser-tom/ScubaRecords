@@ -92,7 +92,10 @@ VERSION     : 1.0
 					<tbody>
 						<tr>
 							<th>Volume: </th>
-							<td>{{$dive["tankvolume"]*1000}}</td>
+							@if(is_numeric($dive["tankvolume"]))
+								<td>{{$dive["tankvolume"]*1000}}</td>
+							@endif
+								<td>Volume inconnu</td>
 						</tr>
 						<tr>
 							<th>Pression début: </th>

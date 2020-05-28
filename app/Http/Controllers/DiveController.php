@@ -456,22 +456,6 @@ class DiveController extends Controller
         }
         $json = json_encode($array, JSON_PRETTY_PRINT);
         return $json;
-        /* computer_name:Shearwater Predator;
-        computer_model:Shearwater Predator;
-        mix_o2:0.210;
-        mix_n2:0.790;
-        mix_he:0.000;
-        mix_ar:0.000;
-        mix_h2:0.000;
-        datetime_start:2006-04-28T15:49;
-        tank_volume:0.015;
-        tank_press_start:20000000.0;
-        consumption:0.0002;
-        lead_quantity:0;
-        dive_duration:4900;
-        datetime_end:
-
-        */
     }
 
     /*
@@ -649,9 +633,6 @@ class DiveController extends Controller
             $waypoint->addChild('temperature', $value["Temperature"]);
         }
 
-        $xmlDefault = $this->formatXml($xmlDefault);
-        $xmlDefault = simplexml_load_string($xmlDefault);
-        $xmlDefault->asXml('test.xml');
         return $xmlDefault;
 
     }
@@ -691,7 +672,10 @@ class DiveController extends Controller
         }
 
         for ($i=37; $i < count($data); $i++) { 
-            $tmp = explode($separator, $data[37]);
+            $tmp = explode($separator, $data[$i]);
+            if (count($tmp) < 2) {
+                break;// break on last line
+            }
             $time = explode(":", $tmp[0]);
             $time = ($time[0]*3600)+($time[1]*60)+$time[2];
             $depth = number_format($tmp[1]/3.2808, 1, ',', '');
@@ -703,21 +687,8 @@ class DiveController extends Controller
             $waypoint->addChild('temperature', $temperature);
         }
 
-        $xmlDefault = $this->formatXml($xmlDefault);
-        $xmlDefault = simplexml_load_string($xmlDefault);
-        $xmlDefault->asXml('test.xml');
         return $xmlDefault;
 
-    }
-
-    // TODO explain why ???
-    function formatXml($simpleXMLElement){
-        $xmlDocument = new \DOMDocument('1.0');
-        $xmlDocument->preserveWhiteSpace = false;
-        $xmlDocument->formatOutput = true;
-        $xmlDocument->loadXML($simpleXMLElement->asXML());
-
-        return $xmlDocument->saveXML();
     }
 
     public function humanDate($datetime){
