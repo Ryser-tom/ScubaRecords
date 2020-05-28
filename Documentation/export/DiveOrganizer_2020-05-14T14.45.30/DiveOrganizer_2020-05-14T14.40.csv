@@ -1,0 +1,6 @@
+﻿Date,Duration,Surface time,Max depth [m],Min temp [°C],Dive mode,Deco dive,Deco stop violation,Deco stop missed
+14.05.2020 14:40:10,00:45:00,--,25.0,2.0,Air,Y,,
+
+Gas,O2 [%],PPO2 [bar],Capacity [l],Volume [cu ft],Operating pressure [psi],Initial pressure [bar],End pressure [bar]
+
+Dive time [mm:ss],Depth [m],Temperature [°C],Gas,High pressure [bar],Gas consumption [l/min]

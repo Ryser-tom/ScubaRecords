@@ -66,10 +66,7 @@
           <link ref="mix15"/>
         </tankdata>
         <samples>
-          <waypoint>
-            <depth>3.4</depth>
-            <divetime>10</divetime>
-            <temperature>283.15</temperature>
+          <waypoint><depth>3.4</depth><divetime>10</divetime><temperature>283.15</temperature>
           </waypoint>
           <waypoint>
             <depth>4.3</depth>

@@ -130,9 +130,48 @@
   - Form inconnu utiliser {{ Form::hidden('invisible', 'secret') }} (input invisible)
     - ajout de laravelcollective/html par composer (composer require laravelcollective/html)
   
+## 20.05.2020
+  - l'affichage du formulaire du club ne s'affiche pas en 2 colonnes comme il le devrait
+    - laravel utilise bootstrap 3.3.6 par défaut, et le système de grid as changé, je pensait être en 4.4.1
 
 ## 21.05.2020
   - Après la modification d'une plongée il semblerait que je perde des "dive_tags"
     - Impossible de re créer l'erreur.
   - Erreur lors de la récupération de la date pour le formulaire de modification
     - Création de $date avec une concaténation des éléments obtenu après l'explode du dateTime.
+  - Problème lors de la redirection, je me retrouve sur une page 404
+  - problème lors de la récupération des données, impossible de faire appel à ->toArray()
+
+## 22.05.2020 Vendredi
+  - 
+
+## 23.05.2020
+  - 
+
+## 24.05.2020
+  - 
+
+## 26.05.2020
+  - Erreur lors de l'affichage du graphique, unexpected token ':'
+    - pour corriger l'erreur j'ai placé le contenu de la plongée dans un string (entre "")
+  - Puis j'obtien l'erreur SyntaxError: "" string literal contains an unescaped line break
+
+## 27.05.2020 
+  - erreur 403 après avoir transféré le site sur le serveur.
+    - https://www.laravel.fr/t/besoin-daide/403-forbidden-1
+  - erreur Class 'Illuminate\Routing\RouteAction' not found
+    - $composer update
+  - ErrorException
+file_put_contents(C:\laragon\www\ScubaRecords\storage\framework/sessions/nR6sMadSdDTRUeNi89GwASI9mpvxkwcOh7RsmcnT): failed to open stream: No such file or directory 
+    - J'ai utilisé la commande suivante pour recréer le cache (le problème viendrais du fait que j'avais deja deploxé un projet au paravant.) $php artisan config:cache 
+  - Création de la base de données avec pour identifiant: x671w_scubarecords:iAHqY7VlppptMsF2&LZZgdqHQZ_RXYB
+  - erreur highchart 14 (String value sent to series.data, expected Number)
+    - j'ai parse toutes les données du graphique avec parseFloat()
+  - Le graphique s'affiche et les données sont justes, mais l'échelle horizontale utilise un format datetime et non time
+    - j'ai modifier la valeur du temps que je récupérait de la base de données et l'ai traité différament pour en faire un date time en secondes.
+  - Lors de la tentative de création d'un compte depuis le site sur l'hébergeur j'ai une erreur de connexion refusée
+    - lors que j'essaye de faire une requête à la base de données avec pdo (depuis le site) cela fonctionne, mais les requêtes eloquent ne fonctionne toujours pas, j'ai contacté le support d'Infomaniak, ainsi que Mme Travnjak pour obtenir de l'aide concernant le sujet.
+  - La plongée 60 n'affiche pas le graphique mais ne retourne pas d'erreurs
+    - Le problème semble venir de l'import de fichier Aeris, dans les données de profondeur de la plongée.
+    - à la ligne 694 j'avais laissé $data[37] à la place de $data[$i]
+    - J'avais aussi oublié de break sur la dernière ligne. (une ligne vide)

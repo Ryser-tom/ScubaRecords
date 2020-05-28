@@ -3,77 +3,77 @@
     <!-- the <generator> section has to appear in every UDDF file -->
     <generator>
         <!-- description of the program generating the UDDF file -->
-        <name>Tausim v1.0</name>
+        <name>ScubaRecords</name>
         <manufacturer>
-            <name>Kai Schröder</name>
+            <name>Tom Ryser</name>
         </manufacturer>
         <version>1.0</version>
         <datetime>2006-04-28</datetime>
     </generator>
+    <!-- Description of the diver -->
     <diver>
-        <owner id="owner">
+        <owner>
             <personal>
                 <firstname/>
                 <lastname/>
             </personal>
             <equipment>
-                <divecomputer id="8caa54b3">
-                    <name>Shearwater Predator</name>
-                    <model>Shearwater Predator</model>
+                <divecomputer>
+                    <name/>
+                    <model/>
                 </divecomputer>
             </equipment>
         </owner>
     </diver>
+    <!-- Description of the diving site -->
     <divesite>
-        <site id="site_tausim_0.0_1030.0">
-            <name>Rivaz Gare</name>
+        <site>
+            <name/>
             <geography>
-                <location>Rivaz Gare</location>
-                <latitude>46.473909</latitude>
-                <longitude>6.784671</longitude>
-                <altitude>0.0</altitude>   <!-- sea level -->
+                <location/>
+                <latitude/>
+                <longitude/>
+                <altitude/>
             </geography>
             <sitedata>
-                <density>1030.0</density>  <!-- salt water -->
+                <density/>
             </sitedata>
         </site>
     </divesite>
     <gasdefinitions>
         <!-- all breathing gases used -->
-        <mix id="air">
-            <name>air</name>
-            <o2>0.210</o2>
-            <n2>0.790</n2>
-            <he>0.000</he>
-            <ar>0.000</ar>
-            <h2>0.000</h2>
+        <mix>
+            <name/>
+            <o2/>
+            <n2/>
+            <he/>
+            <ar/>
+            <h2/>
         </mix>
     </gasdefinitions>
     <profiledata>
         <!-- in the following one recorded dive profile is shown examplarily -->
-        <repetitiongroup id="rg_tausim_060428_001">
-            <dive id="dive_tausim_060428_1549">
+        <repetitiongroup>
+            <dive>
                 <informationbeforedive>
-                    <datetime>2006-04-28T15:49</datetime>
+                    <datetime/>
                     <surfaceintervalbeforedive>
                         <infinity/>
                     </surfaceintervalbeforedive>
                     <tankdata>
-                        <link ref="air"/>
-                        <tankvolume>0.015</tankvolume>
-                        <tankpressurebegin>20000000.0</tankpressurebegin>
-                        <breathingconsumptionvolume>0.0002</breathingconsumptionvolume>       <!-- [m^3/s] ^= 12 litres/min -->
+                        <link/>
+                        <tankvolume/>
+                        <tankpressurebegin/>
+                        <breathingconsumptionvolume/>       <!-- [m^3/s] ^= 12 litres/min -->
                     </tankdata>
                     <equipmentused>
-                        <leadquantity>0</leadquantity>
+                        <leadquantity/>
                     </equipmentused>
                 </informationbeforedive>
                 <informationafterdive>
-                    <!-- temperature is of no importance in "Tausim", but the greatest depth -->
-                    <!-- reached during a (simulated) dive is written into the UDDF output   -->
-                    <greatestdepth>49.0</greatestdepth>
-                    <averagedepth>19.901</averagedepth>
-                    <diveduration>4900</diveduration>
+                    <greatestdepth/>
+                    <averagedepth/>
+                    <diveduration/>
                     <notes>
                         <para/>
                     </notes>
@@ -82,26 +82,6 @@
                     </rating>
                     <visibility/>
                 </informationafterdive>
-                <applicationdata>
-                    <!-- Within this section data relevant only to the program generating -->
-                    <!-- the profile - in this case "Tausim" - are given. These data can  -->
-                    <!-- be ignored by other programs.                                    -->
-                    <tausim>
-                        <pres>4000000.0</pres>
-                        <timeinc>10</timeinc>
-                        <depthinc>10</depthinc>
-                        <durdep>9</durdep>
-                        <nstatic>18</nstatic>
-                        <rls>50</rls>
-                        <decomodel>ZH-L16</decomodel>
-                        <buehl>5</buehl>
-                        <tissues>16</tissues>
-                        <ip>75073.70000</ip><ip>75073.70000</ip><ip>75073.70000</ip><ip>75073.70</ip>
-                        <ip>75073.70000</ip><ip>75073.70000</ip><ip>75073.70000</ip><ip>75073.70</ip>
-                        <ip>75073.70000</ip><ip>75073.70000</ip><ip>75073.70000</ip><ip>75073.70</ip>
-                        <ip>75073.70000</ip><ip>75073.70000</ip><ip>75073.70000</ip><ip>75073.70</ip>
-                    </tausim>
-                </applicationdata>
                 <samples>
                     <waypoint>
                         <depth>0.0</depth>
@@ -181,12 +161,7 @@
                         <divetime>4500.0</divetime>
                     </waypoint>
                 </samples>
-            </dive> <!-- end dive_tausim_060428_1549 -->
-            <!-- here more <dive> sections can be inserted -->
+            </dive>
         </repetitiongroup>
-        <!-- here more <repetitiongroup> sections can be inserted -->
     </profiledata>
-    <tablegeneration>
-        <!-- here follow instructions for the generation of dive tables -->
-    </tablegeneration>
 </uddf>

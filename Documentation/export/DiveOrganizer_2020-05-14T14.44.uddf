@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<uddf version="3.2.0">
+  <generator>
+    <name>Dive Organizer 2.25</name>
+    <manufacturer id="mares">
+      <name>Mares</name>
+      <contact>
+        <homepage>http://computer.mares.com/index.php</homepage>
+      </contact>
+    </manufacturer>
+    <version>2.25.16.9738</version>
+    <datetime>2020-05-14T14:44:52.0319432+02:00</datetime>
+  </generator>
+  <diver>
+    <owner id="kiiraga">
+      <personal>
+        <firstname>tom</firstname>
+        <lastname>ryser</lastname>
+      </personal>
+      <equipment />
+    </owner>
+  </diver>
+  <divesite>
+    <site id="site_23_guid_7a9705ea-70a7-4759-ba7b-24077ef0977f">
+      <name>Hermance plage</name>
+      <geography>
+        <location>hermance</location>
+        <address>
+          <country>Suisse</country>
+        </address>
+        <latitude>46.30378</latitude>
+        <longitude>6.241216</longitude>
+      </geography>
+      <sitedata>
+        <density>1000</density>
+      </sitedata>
+    </site>
+  </divesite>
+  <profiledata>
+    <repetitiongroup id="repgroup_dive_#1_2020-05-14T14:40:10">
+      <dive id="#1_2020-05-14T14:40:10">
+        <informationbeforedive>
+          <link ref="site_23_guid_7a9705ea-70a7-4759-ba7b-24077ef0977f" />
+          <datetime>2020-05-14T14:40:10</datetime>
+          <surfaceintervalbeforedive>
+            <infinity />
+          </surfaceintervalbeforedive>
+        </informationbeforedive>
+        <samples>
+          <waypoint />
+        </samples>
+        <informationafterdive>
+          <lowesttemperature>275.15</lowesttemperature>
+          <greatestdepth>25</greatestdepth>
+          <diveduration>2700</diveduration>
+          <equipmentused />
+        </informationafterdive>
+      </dive>
+    </repetitiongroup>
+  </profiledata>
+</uddf>
