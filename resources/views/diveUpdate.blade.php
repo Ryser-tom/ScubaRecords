@@ -23,7 +23,7 @@ VERSION     : 1.0
 	@endphp
 	<div class="container">
         <div class="row">
-            <form action="/sendUpdate" method="post">
+            <form action="/sendUpdateDive" method="post">
 				{{csrf_field()}}
 				{{ Form::hidden('idDive', $data[0]["idDive"]) }}
                 <fieldset>

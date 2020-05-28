@@ -22,36 +22,9 @@ use App\Divesite;
 use App\Xml;
 use DB;
 
+//TODO: find an other way than encode->decode
 class DiveController extends Controller
 {
-    /*
-
-
-        SELECT dives.*, GROUP_CONCAT( 
-            DISTINCT CONCAT('{',tags.name,':',dive_tags.txtValue,'}')
-            ORDER BY dive_tags.idTag 
-            SEPARATOR ';')
-        FROM dive_tags
-        INNER JOIN tags ON tags.idTag = dive_tags.idTag
-        INNER JOIN dives ON dives.idDive = dive_tags.idDive
-        WHERE dives.public = 1
-        GROUP BY dive_tags.idDive
-
-        $dives = DB::table('dive_tags')
-        ->selectRaw('
-            dives.*, GROUP_CONCAT( 
-            DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-            ORDER BY dive_tags.idTag 
-            SEPARATOR " ")
-            ')
-        ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-        ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-        ->where('public', 1)
-        ->groupBy('dives.idDive')
-        ->get();
-
-        return $dives->toJson(JSON_PRETTY_PRINT);
-    */
 
     public function index(){
         $dives = DB::table('dive_tags')
@@ -97,9 +70,12 @@ class DiveController extends Controller
         ->groupBy('dives.idDive')
         ->get();
 
-        $data = $this->serializeDive($dives->toArray(), 0);
+        $data[0] = json_decode($this->serializeDive($dives->toArray(), 0), true);
+
+        $siteData = DiveSite::where('name',$site)->first();
+        $data[1] = $siteData->toArray();
         
-        return view('dives')->with( 'data', json_decode($data, true));
+        return view('site')->with( 'data', $data);
     }
 
     public function personnal(){
@@ -148,9 +124,12 @@ class DiveController extends Controller
         ->groupBy('dives.idDive')
         ->get();
 
-        $data = $this->serializeDive($dives->toArray(), 0);
+        $data[0] = json_decode($this->serializeDive($dives->toArray(), 0), true);
+
+        $siteData = DiveSite::where('name',$site)->first();
+        $data[1] = $siteData->toArray();
         
-        return view('dives')->with( 'data', json_decode($data, true));
+        return view('site')->with( 'data', $data);
     }
 
     public function followed(){
@@ -203,26 +182,47 @@ class DiveController extends Controller
             ->count();
 
         $dive = DB::table('dive_tags')
-        ->selectRaw('
-            dives.*, diveSites.name as diveSiteName,  GROUP_CONCAT( 
-            DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-            ORDER BY dive_tags.idTag 
-            SEPARATOR ";") AS tags
-            ')
-        ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-        ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-        ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
-        ->where(function($q) use ($user) {
-            $q->where('dives.public', 1)
-              ->orWhere('dives.diver', $user->idUser);
-        })
-        ->where('dives.idDive', $id)
-        ->groupBy('dives.idDive')
-        ->get();
+            ->selectRaw('
+                dives.*, diveSites.name as diveSiteName,  GROUP_CONCAT( 
+                DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
+                ORDER BY dive_tags.idTag 
+                SEPARATOR ";") AS tags
+                ')
+            ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
+            ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
+            ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
+            ->where(function($q) use ($user) {
+                $q->where('dives.public', 1)
+                ->orWhere('dives.diver', $user->idUser);
+            })
+            ->where('dives.idDive', $id)
+            ->groupBy('dives.idDive')
+            ->get();
 
-        $data = $this->serializeDive($dive->toArray(), $diveNb);
-        
-        return view('dive')->with( 'data', json_decode($data, true));
+        $data = json_decode($this->serializeDive($dive->toArray(), $diveNb), true);
+        $data[0]["datetime"] = $this->humanDate($data[0]["datetime"]);
+
+        $data[1] = $this->getDiveDataRT($data[0]["xml"]);
+        return view('dive')->with( 'data', $data);
+    }
+
+    public function getDiveDataRT($xml){
+        $file = Storage::get($xml);
+        $xmldata = simplexml_load_string($file);
+        $result="";
+
+        //$waypoint = $xmldata->profiledata->repetitiongroup->dive->sample->waypoint;
+        $waypoints = $xmldata->profiledata->repetitiongroup->dive->samples;
+        $temperature;
+        for ($i=0; $i < count($waypoints->waypoint) ; $i++) { 
+            $tmp = $waypoints->waypoint[$i];
+            if (isset($tmp->temperature)) {
+                $temperature = $tmp->temperature;
+            }
+            $time = (int) $tmp->divetime;
+            $result = $result.$time.";".$tmp->depth.";".$temperature."|";
+        }
+        return $result;
     }
 
     public function showUpdate($id){
@@ -284,19 +284,24 @@ class DiveController extends Controller
         $upload = $request->file('log');
         $file = file_get_contents($upload->getPathname(), true);
 
-        $type['uddf'] = strstr($file, '<uddf');
+        $type['Uddf'] = strstr($file, 'uddf');
         $type['Suunto'] = strstr($file, 'Suunto');
+        $type['Aeris'] = strstr($file, 'PDC Model: OCi');
 
         $test = count($type);
         foreach ($type as $key => $value) {
             if ($value != false) {
                 switch ($key) {
-                    case 'uddf':
+                    case 'Uddf':
                         # code...
                         break 2;
                     
                     case 'Suunto':
                         $converted = $this->suunto($file);
+                        break;
+                    
+                    case 'Aeris':
+                        $converted = $this->aeris($file);
                         break;
 
                     default:
@@ -320,7 +325,7 @@ class DiveController extends Controller
         $result = $this->uddf($public, $path, json_decode($tags, true));
 
         if ($result["success"]) {
-            return redirect()->route('showDive', array('diveId' => $result["diveId"]));
+            return redirect()->route('showUpdateDive', array('diveId' => $result["diveId"]));
         }
     }
 
@@ -395,7 +400,7 @@ class DiveController extends Controller
           ->where('idTag', 14)
           ->update(['txtValue' => $_POST["depth"]]);
 
-          return redirect()->route('showDive', array('diveId' => $_POST["idDive"]));
+        return redirect()->route('showDive', array('diveId' => $_POST["idDive"]));
     }
 
     public function delete(Dive $dive){
@@ -489,8 +494,15 @@ class DiveController extends Controller
             foreach ($xmldata as $key => $level0) {
                 $test = $level0->$tag_name;
                 if(!empty($test)){
-                    $result_tag[$tag["idTag"]] = (string)$test[0];
-                    break;
+                    if ($tag["name"] == "datetime") {
+                        if (strstr($test, 'T')) {
+                            $result_tag[$tag["idTag"]] = (string)$test[0];
+                            break;
+                        }
+                    }else{
+                        $result_tag[$tag["idTag"]] = (string)$test[0];
+                        break;
+                    }
                 }
                 foreach ($level0 as $key => $level1) {
                     $test = $level1->$tag_name;
@@ -614,34 +626,18 @@ class DiveController extends Controller
     public function suunto($string){
         $xmldata = simplexml_load_string($string);
         $defaultFile = Storage::get('public/default/default.uddf');
-        $testXMLString = Storage::get('public/default/test.xml');// check result
-        $testXML = simplexml_load_string($testXMLString);
         $xmlDefault = simplexml_load_string($defaultFile);
 
 
         $xmlDefault->gasdefinitions->mix->he = $xmldata->DiveMixtures->DiveMixture->Helium;
         $xmlDefault->gasdefinitions->mix->o2 = $xmldata->DiveMixtures->DiveMixture->Oxygen;
-        //$xmlDefault->gasdefinitions->mix->n2
-        //$xmlDefault->gasdefinitions->mix->ar
-        //$xmlDefault->gasdefinitions->mix->h2
-
-        //$xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->datetime
-        //$xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->surfaceintervalbeforedive
-        //$xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->equipmentused->leadquantity
 
         $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->tankdata->tankvolume = $xmldata->CylinderVolume;
         $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->tankdata->tankpressurebegin = $xmldata->CylinderWorkPressure;
-        //$xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->tankdata->breathingconsumptionvolume
 
         $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->greatestdepth = $xmldata->MaxDepth;
         $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->averagedepth = $xmldata->AvgDepth;
         $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->diveduration = $xmldata->Duration;
-        //$xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->notes
-        //$xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->rating
-        //$xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->visibility
-
-
-
 
         $samplesJson = json_encode($xmldata->DiveSamples);
         $sample = json_decode($samplesJson, true);
@@ -660,6 +656,60 @@ class DiveController extends Controller
 
     }
 
+    public function aeris($string){
+        $data = explode(PHP_EOL, $string);
+        $defaultFile = Storage::get('public/default/default.uddf');
+        $xmlDefault = simplexml_load_string($defaultFile);
+
+        $date = explode(" ", $data[4]);
+        $date = explode("/", $date[2]);
+        $time = explode(" ", $data[5]);
+        $timeEx = explode(":", $data[5]);
+
+        $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->datetime = $date[2]."-".$date[0]."-".$date[1]."T".$time[2];
+        $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->surfaceintervalbeforedive = explode(": ", $data[7])[1];
+
+        $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->tankdata->tankvolume = explode(": ", $data[12])[1];
+        $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->tankdata->tankpressurebegin = explode(": ", $data[13])[1];
+        $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->tankdata->breathingconsumptionvolume = explode(" ", $data[14])[2];
+
+        $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->greatestdepth = (explode(" ", $data[8])[2]/3.2808);//TODO check formula
+        $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->averagedepth;
+
+        $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->diveduration = ($timeEx[1]*60+$timeEx[2]);
+
+        
+        //test to know what type of separator has been used
+        $separators = array(",", ";", "\t");
+        $separator;
+        foreach ($separators as $key => $s) {
+            $test = explode($s, $data[37]);
+            if (count($test) != 1) {
+                $separator = $s;
+                break;
+            }
+        }
+
+        for ($i=37; $i < count($data); $i++) { 
+            $tmp = explode($separator, $data[37]);
+            $time = explode(":", $tmp[0]);
+            $time = ($time[0]*3600)+($time[1]*60)+$time[2];
+            $depth = number_format($tmp[1]/3.2808, 1, ',', '');
+            $temperature = number_format(5/9*($tmp[9]-32) + 273.15, 2, ',', '');
+
+            $waypoint = $xmlDefault->profiledata->repetitiongroup->dive->samples->addChild('waypoint');
+            $waypoint->addChild('depth', $depth);
+            $waypoint->addChild('divetime', $time);
+            $waypoint->addChild('temperature', $temperature);
+        }
+
+        $xmlDefault = $this->formatXml($xmlDefault);
+        $xmlDefault = simplexml_load_string($xmlDefault);
+        $xmlDefault->asXml('test.xml');
+        return $xmlDefault;
+
+    }
+
     // TODO explain why ???
     function formatXml($simpleXMLElement){
         $xmlDocument = new \DOMDocument('1.0');
@@ -668,5 +718,15 @@ class DiveController extends Controller
         $xmlDocument->loadXML($simpleXMLElement->asXML());
 
         return $xmlDocument->saveXML();
+    }
+
+    public function humanDate($datetime){
+        $humanDate = "";
+		$date = preg_split('/[-T]/',  $datetime);
+			
+		date_default_timezone_set('Europe/Paris');
+		setlocale(LC_TIME, 'fr_FR.utf8','fra');
+        $humanDate = strftime("%A %d %B %Y",mktime(0,0,0,$date[1],$date[2],$date[0]));
+        return $humanDate;
     }
 }

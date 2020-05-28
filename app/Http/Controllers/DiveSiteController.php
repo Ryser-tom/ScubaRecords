@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use App\DiveSite;
 
 class DiveSiteController extends Controller
 {
@@ -82,5 +83,23 @@ class DiveSiteController extends Controller
         ->get();
         
         return view('map')->with( 'data', json_decode($sites, true));
+    }
+
+    //TODO: check if site not to close to another
+    public function update(){
+
+      if ($_POST["idSite"] == "") {
+          $site =new DiveSite();
+      }else{
+          $site = DiveSite::find($_POST["idSite"]);
+      }
+      $site->name         = $_POST["name"];
+      $site->description  = $_POST["description"];
+      $site->difficulty   = $_POST["difficulty"];
+      $site->latitude     = $_POST["lat"];
+      $site->longitude    = $_POST["lng"];
+      $site->save();
+
+      return redirect()->route('showSite', array('site' => $_POST["name"]));
     }
 }

@@ -61,7 +61,7 @@ VERSION     : 1.0
 		}
 	</style>
 	@php
-		//xdebug_break();
+		xdebug_break();
 	@endphp
     <div class="main main-raised">
 		<div class="profile-content">
@@ -72,26 +72,42 @@ VERSION     : 1.0
 				<div class="row">
 					<!-- TODO: correct the binome -->
 					<div id="left-infos" class="col-sm-3"> 
-						@if($info['idUser'] != Auth::user()->idUser )
-						<form action="/follow" method="post">
-							{{csrf_field()}}
-							{{ Form::hidden('followed', $info['idUser']) }}
-							{{ Form::hidden('name', $info['name']) }}
-							@if($info['followed'])
-								<button class="btn btn-danger" type="submit">Ne plus suivre</button>
+						@if(isset($info['idUser']) && $info['idUser'] != Auth::user()->idUser )
+							<form action="/follow" method="post">
+								{{csrf_field()}}
+								{{ Form::hidden('followed', $info['idUser']) }}
+								{{ Form::hidden('name', $info['name']) }}
+								@if($info['followed'])
+									<button class="btn btn-danger" type="submit">Ne plus suivre</button>
+								@else
+									<button class="btn btn-success" type="submit">Suivre</button>
+								@endif
+							</form>
+						@elseif(isset($info['idClub']) && $info['idClub'] != Auth::user()->idUser )
+							@if($info['master'] == Auth::user()->idUser)
+							<a href="{{ url('/clubs/update/').'/'.$info['name'] }}" class="btn btn-success">modifier le group</a>
 							@else
-								<button class="btn btn-success" type="submit">Suivre</button>
+								<form action="/membership" method="post">
+									{{csrf_field()}}
+									{{ Form::hidden('club', $info['idClub']) }}
+									<!-- TODO: finish the membership -->
+									@if($info['member'])
+										<button class="btn btn-danger" type="submit">Ne plus suivre</button>
+									@else
+										<button class="btn btn-success" type="submit">Suivre</button>
+									@endif
+								</form>
 							@endif
-						</form>
+
+
+						@else
+							<a href="{{ url('/user/update')}}" class="btn btn-success">modifier les informations</a>	
 						@endif
 						@if(isset($info['phone'])) 
 							<p><i class="fas fa-phone" aria-hidden="true"></i>
 							{{$info['phone']}}</p>
 						@endif
 						<p><i class="fas fa-envelope"></i> {{$info['email']}}</p>
-						<p><i class="fas fa-award"></i>
-							<a>Certifications</a></p>
-						<p>Cmas ** | 01/05/2020</p>
 						<p><i class="fas fa-user-friends"></i><a>
 							@if(isset($info['idUser'])) 
 								Binome
@@ -99,26 +115,28 @@ VERSION     : 1.0
 								Membres
 							@endif	
 						</a></p>
+						<!-- TODO: show four informations
 						<div class="row">
 							<div class="col">
 								<img id="profile1" class="binome" src="{{ asset('img/default-profile.svg') }}"/>
-								<p>binome 1</p>
+								<p>name 1</p>
 							</div>
 							<div class="col">
 								<img id="profile2" class="binome" src="{{ asset('img/default-profile.svg') }}"/>
-								<p>binome 2</p>
+								<p>name 2</p>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col">
 								<img id="profile3" class="binome" src="{{ asset('img/default-profile.svg') }}"/>
-								<p>binome 3</p>
+								<p>name 3</p>
 							</div>
 							<div class="col">
 								<img id="profile4" class="binome" src="{{ asset('img/default-profile.svg') }}"/>
-								<p>binome 4</p>
+								<p>name 4</p>
 							</div>
 						</div>
+						-->
 					</div>
 					<div class="col-sm-8">
 						<div id="top-infos" class="row">

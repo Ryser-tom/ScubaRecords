@@ -10,7 +10,10 @@ VERSION     : 1.0
 
 @section('content')
 <div class="card">
-    <div id="map"></div>
+    <form action="/Site/update" method="post">
+		{{csrf_field()}}
+        <div id="map"></div>
+    </form>
 </div>
 
 
@@ -72,5 +75,20 @@ VERSION     : 1.0
                 var popup = L.popup().setLatLng([a.layer._cLatLng.lat, a.layer._cLatLng.lng]).setContent(popUpText).openOn(map); 
             }
         })
+        
+        var popup = L.popup();
+
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent(
+                    e.latlng.toString()+
+                    '<input type="hidden" id="lat" name="lat" value="'+e.latlng.lat+'"><input type="hidden" id="lng" name="lng" value="'+e.latlng.lng+'">'+
+                    '<br /><button type="submit" class="btn btn-primary">ajouter un site de plongée à ces coordonées</button>'
+                    )
+                .openOn(map);
+        }
+
+        map.on('click', onMapClick);
     </script>
 @endsection

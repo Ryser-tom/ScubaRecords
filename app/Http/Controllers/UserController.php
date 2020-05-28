@@ -49,12 +49,6 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
-    public function update(Request $request, User $user){
-        $user->update($request->all());
-
-        return response()->json($user, 200);
-    }
-
     public function delete(User $user){
         $user->delete();
 
@@ -98,5 +92,29 @@ class UserController extends Controller
 
         return redirect('/user/'.$_REQUEST["name"]);
     }
-    
+
+    public function showUpdate(){
+        $userAuth = Auth::user();
+
+        $user = DB::table('users')
+            ->select('*')
+            ->where('users.idUser', $userAuth->idUser)
+            ->get();
+        $dataUpdate = json_decode(json_encode($user->toArray()), true);
+        return view('userUpdate')->with( 'data', $dataUpdate[0]);
+    }
+
+    public function update(){
+        $user = Auth::user();
+        
+        $user = User::find($user->idUser);
+        $user->name= $_POST["name"];
+        $user->email= $_POST["email"];
+        $user->phone= $_POST["phone"];
+        $user->smallDesc= $_POST["smallDesc"];
+        $user->description= $_POST["description"];
+        $user->save();
+
+        return redirect()->route('showUser', array('username' => $_POST["name"]));
+    }
 }
