@@ -175,3 +175,9 @@ file_put_contents(C:\laragon\www\ScubaRecords\storage\framework/sessions/nR6sMad
     - Le problème semble venir de l'import de fichier Aeris, dans les données de profondeur de la plongée.
     - à la ligne 694 j'avais laissé $data[37] à la place de $data[$i]
     - J'avais aussi oublié de break sur la dernière ligne. (une ligne vide)
+  
+## 02.06.2020
+  - Erreur dans la fonction changeMembership "Property [items] does not exist on this collection instance."
+    - pour corriger j'ai remplacer "is_null($result)" par "$membership->count()"
+  - Sur la page du club le status (follow) ne s'affiche plus
+    - j'avais inversé les paramètres de la fonction "getMembership"
