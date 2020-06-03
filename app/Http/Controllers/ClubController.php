@@ -27,31 +27,20 @@ class ClubController extends Controller
 
     public function userClubs(){
         $user = Auth::user();
-
-        $clubs = DB::table('clubs')
-        ->select('*')
-        ->join('members', 'members.idClub', '=', 'clubs.idClub')
-        ->where('members.idUser', $user->idUser)
-        ->get();
+        $club = new Club;
+        $clubs = $club->getAllClubsOfUser($user->idUser);
 
         return view('clubs')->with( 'data', json_decode($clubs, true));
     }   
  
-    public function show($club){
+    public function show($clubName){
         $userAuth = Auth::user();
-
-        $club = json_decode(Club::where('idClub', $club)->first()->toJson(), true);
-
-        $member = DB::table('members')
-        ->select('*')
-        ->where('idClub', $club["idClub"])
-        ->where('idUser', $userAuth->idUser)
-        ->get();
-        if ($member->first()) {
-            $club['member'] = true;
-        }else{
-            $club['member'] = false;
-        }
+        $club = json_decode(Club::where('name', $clubName)->first(), true);
+        
+        $member = new Member;
+        $member = $member->getMembership($club["idClub"], $userAuth->idUser);
+        
+        $club['member'] = $member->first();
 
         return view('profile')->with( 'info', $club);
     }
@@ -89,48 +78,15 @@ class ClubController extends Controller
         return response()->json(null, 204);
     }
 
-    public function getMembers($club){
-        $members = DB::table('clubs')
-        ->join('members', 'members.idClub', '=', 'clubs.idClub')
-        ->join('users', 'members.idUser', '=', 'users.idUser')
-        ->select('users.idUser', 'users.name as username', 'clubs.name')
-        ->where('clubs.idClub', $club)
-        ->get();
-
-        return $members->toJson(JSON_PRETTY_PRINT);
-    }
-
-    public function addMember(Request $request){
-        $member = Member::create($request->all());
-
-        return response()->json($member, 201);
-    }
-
-    public function deleteMember($idUser, $idClub){
-        Member::where('idUser', $idUser)
-        ->where('idClub', $idClub)
-        ->delete();
-
-        return response()->json(null, 204);
-    }
-
-    //$club is the name of the club
-    public function showUpdate($club){
+    public function showUpdate($clubName){
         $user = Auth::user();
 
-        $clubInfos = DB::table('clubs')
-            ->select('*')
-            ->where('clubs.name', $club)
-            ->get();
-        $dataUpdate = json_decode(json_encode($clubInfos->toArray()), true);
+        $club = new Club;
+        $dataUpdate = $club->getClubInfo($clubName);
 
-        $members = DB::table('users')
-            ->join('members', 'members.idUser', '=', 'users.idUser')
-            ->where('members.idClub', $dataUpdate[0]["idClub"])
-            ->get();
-        
+        $member = new Member;
+        $dataUpdate[1] = $member->getMembersOfClub($dataUpdate);
 
-        $dataUpdate[1] = json_decode(json_encode($members->toArray()), true);
         return view('clubUpdate')->with( 'data', $dataUpdate);
     }
 
@@ -147,17 +103,14 @@ class ClubController extends Controller
         return redirect()->route('home');
     }
 
-    public function member(Request $request){
+    public function changeMembership(Request $request){
         
         $userAuth = Auth::user();
 
-        $result = DB::table('members')
-        ->select('*')
-        ->where('idUser', $userAuth->idUser)
-        ->where('idclub', $_REQUEST["club"])
-        ->first();
+        $member = new Member;
+        $membership = $member->getMembership($_REQUEST["club"], $userAuth->idUser);
 
-        if (is_null($result)) {
+        if ($membership->count() == 0) {
             $member = new Member();
             $member->idClub = $_REQUEST["club"];
             $member->idUser = $userAuth->idUser;
@@ -168,6 +121,6 @@ class ClubController extends Controller
             ->delete();
         }
 
-        return redirect('/club/'.$_REQUEST["club"]);
+        return redirect('/club/'.$_REQUEST["clubName"]);
     }
 }

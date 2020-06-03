@@ -11,10 +11,11 @@ VERSION     : 1.0
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
 class DiveSite extends Model
 {
-    protected $table = 'diveSites';
+    protected $table = 'divesites';
     protected $primaryKey = 'idDiveSite';
     public $timestamps = false;
     protected $fillable = [
@@ -27,4 +28,31 @@ class DiveSite extends Model
         'latitude',
         'longitude'
     ];
+
+
+
+    public function getPublicSites(){
+        $sites = DB::table('divesites')
+        ->select('divesites.*')
+        ->join('dives', 'dives.diveSite', '=', 'divesites.idDiveSite')
+        ->where('divesites.idDiveSite', '!=', 0)
+        ->orderBy('divesites.idDiveSite', 'ASC')
+        ->groupBy('divesites.idDiveSite')
+        ->get();
+
+        return $sites;
+    }
+
+    public function getuserSites($user){
+        $sites = DB::table('divesites')
+        ->select('divesites.*')
+        ->join('dives', 'dives.diveSite', '=', 'divesites.idDiveSite')
+        ->where('divesites.idDiveSite', '!=', 0)
+        ->whereIn('dives.diver', $user)
+        ->orderBy('divesites.idDiveSite', 'ASC')
+        ->groupBy('divesites.idDiveSite')
+        ->get();
+
+        return $sites;
+    }
 }

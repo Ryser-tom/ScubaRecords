@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Tags;
+use App\follow;
 use App\Dive;
 use App\DiveTag;
 use App\Tag;
@@ -22,28 +23,32 @@ use App\Divesite;
 use App\Xml;
 use DB;
 
+define('UDDF', 'uddf');
+define('SUUNTO', 'Suunto');
+define('AERIS', 'PDC Model: OCi');
+define('EARTH_RADIUS', 6371000);
+define('SEARCH_RADIUS', 200);
+define('TAGS', array('computerName',
+ 'model', 
+ 'o2', 
+ 'n2', 
+ 'he', 
+ 'ar', 
+ 'h2', 
+ 'dateTime', 
+ 'tpb', 
+ 'lead', 
+ 'diveTime', 
+ 'depth'
+ ));
+
 //TODO: find an other way than encode->decode
 class DiveController extends Controller
 {
 
     public function index(){
-        $dives = DB::table('dive_tags')
-        ->selectRaw('
-            DISTINCT dives.*, GROUP_CONCAT( 
-            DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-            ORDER BY dive_tags.idTag 
-            SEPARATOR ";") AS tags, 
-            users.name as username,
-            diveSites.name as diveSiteName
-            ')
-        ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-        ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-        ->join('users', 'users.idUser', '=', 'dives.diver')
-        ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
-        ->where('dives.public', 1)
-        ->orderBy('dives.idDive', 'DESC')
-        ->groupBy('dives.idDive')
-        ->get();
+        $dive = new Dive;
+        $dives = $dive->getAllPublicDives();
 
         $data = $this->serializeDive($dives->toArray(), 0);
         
@@ -51,52 +56,21 @@ class DiveController extends Controller
     }
  
     public function publicSite($site){
-        $dives = DB::table('dive_tags')
-        ->selectRaw('
-            DISTINCT dives.*, GROUP_CONCAT( 
-            DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-            ORDER BY dive_tags.idTag 
-            SEPARATOR ";") AS tags, 
-            users.name as username,
-            diveSites.name as diveSiteName
-            ')
-        ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-        ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-        ->join('users', 'users.idUser', '=', 'dives.diver')
-        ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
-        ->where('dives.public', 1)
-        ->where('diveSites.name', $site)
-        ->orderBy('dives.idDive', 'DESC')
-        ->groupBy('dives.idDive')
-        ->get();
+        $dive = new Dive;
+        $dives = $dive->getAllPublicDivesOfSite($site);
 
         $data[0] = json_decode($this->serializeDive($dives->toArray(), 0), true);
 
         $siteData = DiveSite::where('name',$site)->first();
         $data[1] = $siteData->toArray();
         
-        return view('site')->with( 'data', $data);
+        return view('dives')->with( 'data', $data);
     }
 
     public function personnal(){
-        $user = Auth::user();
-        $dives = DB::table('dive_tags')
-        ->selectRaw('
-            DISTINCT dives.*, GROUP_CONCAT( 
-            DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-            ORDER BY dive_tags.idTag 
-            SEPARATOR ";") AS tags, 
-            users.name as username, 
-            diveSites.name as diveSiteName
-            ')
-        ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-        ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-        ->join('users', 'users.idUser', '=', 'dives.diver')
-        ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
-        ->where('dives.diver', $user->idUser)
-        ->orderBy('dives.idDive', 'DESC')
-        ->groupBy('dives.idDive')
-        ->get();
+        $userAuth = Auth::user();
+        $dive = new Dive;
+        $dives = $dive->getDivesOfUser($userAuth);
 
         $data = $this->serializeDive($dives->toArray(), 0);
         
@@ -105,60 +79,24 @@ class DiveController extends Controller
 
     public function personnalSite($site){
         $user = Auth::user();
-        $dives = DB::table('dive_tags')
-        ->selectRaw('
-            DISTINCT dives.*, GROUP_CONCAT( 
-            DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-            ORDER BY dive_tags.idTag 
-            SEPARATOR ";") AS tags, 
-            users.name as username, 
-            diveSites.name as diveSiteName
-            ')
-        ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-        ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-        ->join('users', 'users.idUser', '=', 'dives.diver')
-        ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
-        ->where('dives.diver', $user->idUser)
-        ->where('diveSites.name', $site)
-        ->orderBy('dives.idDive', 'DESC')
-        ->groupBy('dives.idDive')
-        ->get();
+        $dive = new Dive;
+        $dives = $dive->getPersonnalDivesOfSite($user, $site);
+        $siteData = DiveSite::where('name',$site)->first();
 
         $data[0] = json_decode($this->serializeDive($dives->toArray(), 0), true);
-
-        $siteData = DiveSite::where('name',$site)->first();
         $data[1] = $siteData->toArray();
         
-        return view('site')->with( 'data', $data);
+        return view('dives')->with( 'data', $data);
     }
 
     public function followed(){
-        $user = Auth::user();
+        $userAuth = Auth::user();
 
-        $followed = DB::table('following')
-        ->selectRaw('distinct GROUP_CONCAT(idFollowed) as id')
-        ->where('idFollower', $user->idUser)
-        ->get();
-        $tmp = json_decode(json_encode($followed->toArray()), true);
-        $follow_ar=explode(',', $tmp[0]['id']);
-        
-        $dives = DB::table('dive_tags')
-        ->selectRaw('
-            DISTINCT dives.*, GROUP_CONCAT( 
-            DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-            ORDER BY dive_tags.idTag 
-            SEPARATOR ";") AS tags, 
-            users.name as username,
-            diveSites.name as diveSiteName
-            ')
-        ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-        ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-        ->join('users', 'users.idUser', '=', 'dives.diver')
-        ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
-        ->whereIn('dives.diver', $follow_ar)
-        ->orderBy('dives.idDive', 'DESC')
-        ->groupBy('dives.idDive')
-        ->get();
+        $follow = new Follow;
+        $follow_ar = $follow->getUserArr($userAuth->idUser);
+
+        $dive = new Dive;
+        $dives = $dive->getDivesOfUser($follow_ar);
 
         $data = $this->serializeDive($dives->toArray(), 0);
         
@@ -166,47 +104,21 @@ class DiveController extends Controller
     }
 
     //TODO: find a way to send value from a controller to multiple vue
-    public function show($id){
-        $user = Auth::user();
+    public function show($idDive){
+        $userAuth = Auth::user();
 
-        $diver = DB::table('dives')
-            ->select('diver')
-            ->where('idDive', $id)
-            ->get();
-        $tmp = json_decode(json_encode($diver->toArray()), true);
+        $dive = new Dive;
+        $diveData = $dive->getInfo($idDive, $userAuth->idUser);
 
-        $diveNb = DB::table('dives')
-            ->join('users', 'users.idUser', '=', 'dives.diver')
-            ->where('dives.diver', $tmp[0]["diver"])
-            ->where('dives.idDive', '<=', $id)
-            ->count();
-
-        $dive = DB::table('dive_tags')
-            ->selectRaw('
-                dives.*, diveSites.name as diveSiteName,  GROUP_CONCAT( 
-                DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-                ORDER BY dive_tags.idTag 
-                SEPARATOR ";") AS tags
-                ')
-            ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-            ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-            ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
-            ->where(function($q) use ($user) {
-                $q->where('dives.public', 1)
-                ->orWhere('dives.diver', $user->idUser);
-            })
-            ->where('dives.idDive', $id)
-            ->groupBy('dives.idDive')
-            ->get();
-
-        $data = json_decode($this->serializeDive($dive->toArray(), $diveNb), true);
+        $data = json_decode($this->serializeDive($diveData[0]->toArray(), $diveData[1]), true);
         $data[0]["datetime"] = $this->humanDate($data[0]["datetime"]);
 
-        $data[1] = $this->getDiveDataRT($data[0]["xml"]);
+        $data[1] = $this->getDiveData($data[0]["xml"]);
         return view('dive')->with( 'data', $data);
     }
 
-    public function getDiveDataRT($xml){
+    //Format data for the graph
+    public function getDiveData($xml){
         $file = Storage::get($xml);
         $xmldata = simplexml_load_string($file);
         $result="";
@@ -225,44 +137,15 @@ class DiveController extends Controller
         return $result;
     }
 
-    public function showUpdate($id){
-        $user = Auth::user();
+    public function showUpdate($idDive){
+        $userAuth = Auth::user();
 
-        $diver = DB::table('dives')
-            ->select('diver')
-            ->where('idDive', $id)
-            ->get();
-        $tmp = json_decode(json_encode($diver->toArray()), true);
+        $dive = new Dive;
+        $diveData = $dive->getInfo($idDive, $userAuth->idUser);
 
-        $diveNb = DB::table('dives')
-            ->join('users', 'users.idUser', '=', 'dives.diver')
-            ->where('dives.diver', $tmp[0]["diver"])
-            ->where('dives.idDive', '<=', $id)
-            ->count();
-
-        $dive = DB::table('dive_tags')
-            ->selectRaw('
-                dives.*, diveSites.name as diveSiteName,  GROUP_CONCAT( 
-                DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-                ORDER BY dive_tags.idTag 
-                SEPARATOR ";") AS tags
-                ')
-            ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-            ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-            ->join('diveSites', 'diveSites.idDiveSite', '=', 'dives.diveSite')
-            ->where(function($q) use ($user) {
-                $q->where('dives.public', 1)
-                ->orWhere('dives.diver', $user->idUser);
-            })
-            ->where('dives.idDive', $id)
-            ->groupBy('dives.idDive')
-            ->get();
-
-        $sites = DB::table('divesites')
-            ->select('*')
-            ->get();
+        $sites = DB::table('divesites')->get();
         
-        $dataUpdate = json_decode($this->serializeDive($dive->toArray(), $diveNb), true);
+        $dataUpdate = json_decode($this->serializeDive($diveData[0]->toArray(), $diveData[1]), true);
 
         $dataUpdate[1] = json_decode($sites, true);
         return view('diveUpdate')->with( 'data', $dataUpdate);
@@ -284,23 +167,22 @@ class DiveController extends Controller
         $upload = $request->file('log');
         $file = file_get_contents($upload->getPathname(), true);
 
-        $type['Uddf'] = strstr($file, 'uddf');
-        $type['Suunto'] = strstr($file, 'Suunto');
-        $type['Aeris'] = strstr($file, 'PDC Model: OCi');
+        $type[UDDF] = strstr($file, 'uddf');
+        $type[SUUNTO] = strstr($file, 'Suunto');
+        $type[AERIS] = strstr($file, 'PDC Model: OCi');
 
         $test = count($type);
         foreach ($type as $key => $value) {
             if ($value != false) {
                 switch ($key) {
-                    case 'Uddf':
-                        # code...
+                    case UDDF:
                         break 2;
                     
-                    case 'Suunto':
+                    case SUUNTO:
                         $converted = $this->suunto($file);
                         break;
                     
-                    case 'Aeris':
+                    case SUUNTO:
                         $converted = $this->aeris($file);
                         break;
 
@@ -315,8 +197,9 @@ class DiveController extends Controller
             return "The file you just sended is not supported. You can contact me at tom.rsr@eduge.ch";
         }
         // replace old data in imported file for save
-        file_put_contents($upload, $converted->saveXML());
-        $did_it_worked = file_get_contents($upload->getPathname(), true);
+        if ($key != UDDF) {
+            file_put_contents($upload, $converted->saveXML());
+        }
         // https://laracasts.com/discuss/channels/laravel/how-to-write-texts-to-file-in-laravel?page=1
         $path=$upload->store('public/storage');
 
@@ -333,9 +216,9 @@ class DiveController extends Controller
     public function update(Request $request, Dive $diveData){
         
         if (isset($_POST["public"])) {
-            $public = 0;
+            $public = false;
         }else{
-            $public = 1;
+            $public = true;
         }
 
         $dive = Dive::find($_POST["idDive"]);
@@ -343,63 +226,20 @@ class DiveController extends Controller
         $dive->boat= $_POST["boat"];
         $dive->weather= $_POST["weather"];
         $dive->description= $_POST["description"];
-        $dive->pressionInit= $_POST["tpb"];
+        $dive->pressionInit= (int)$_POST["tpb"];
         $dive->public= $public;
         $dive->save();
 
-        $dateTime = $_POST["date"]."T".$_POST["entryTime"];
-        $diveTime = $_POST["diveTime"]*60;
+        $_POST["dateTime"] = $_POST["date"]."T".$_POST["entryTime"];
+        $_POST["diveTime"] = $_POST["diveTime"]*60;
 
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 1)
-          ->update(['txtValue' => $_POST["computerName"]]);
+        foreach (TAGS as $key => $value) {
+            DiveTag::where('idDive', $_POST["idDive"])
+                ->where('idTag', $key+1)
+                ->update(['txtValue' => $_POST[$value]]);
+        }
 
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 2)
-          ->update(['txtValue' => $_POST["model"]]);
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 3)
-          ->update(['txtValue' => $_POST["o2"]]);
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 4)
-          ->update(['txtValue' => $_POST["n2"]]);
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 5)
-          ->update(['txtValue' => $_POST["he"]]);
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 6)
-          ->update(['txtValue' => $_POST["ar"]]);
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 7)
-          ->update(['txtValue' => $_POST["h2"]]);
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 8)
-          ->update(['txtValue' => $dateTime]);
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 10)
-          ->update(['txtValue' => $_POST["tpb"]]);
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 12)
-          ->update(['txtValue' => $_POST["lead"]]);
-
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 13)
-          ->update(['txtValue' => $diveTime]);
-
-
-
-        DiveTag::where('idDive', $_POST["idDive"])
-          ->where('idTag', 14)
-          ->update(['txtValue' => $_POST["depth"]]);
-
+        
         return redirect()->route('showDive', array('diveId' => $_POST["idDive"]));
     }
 
@@ -407,38 +247,6 @@ class DiveController extends Controller
         $dive->delete();
 
         return response()->json(null, 204);
-    }
-
-    public function test($id){
-        $diver = DB::table('dives')
-            ->select('diver')
-            ->where('idDive', $id)
-            ->get();
-        $tmp = json_decode(json_encode($diver->toArray()), true);
-
-        $diveNb = DB::table('dives')
-            ->join('users', 'users.idUser', '=', 'dives.diver')
-            ->where('dives.diver', $tmp[0]["diver"])
-            ->where('dives.idDive', '<=', $id)
-            ->count();
-
-        $dive = DB::table('dive_tags')
-        ->selectRaw('
-            dives.*,  GROUP_CONCAT( 
-            DISTINCT CONCAT(tags.name,":",dive_tags.txtValue)
-            ORDER BY dive_tags.idTag 
-            SEPARATOR ";") AS tags
-            ')
-        ->join('tags', 'tags.idTag', '=', 'dive_tags.idTag')
-        ->join('dives', 'dives.idDive', '=', 'dive_tags.idDive')
-        ->where('dives.public', 1)
-        ->where('dives.idDive', $id)
-        ->groupBy('dives.idDive')
-        ->get();
-
-        $data = $this->serializeDive($dive->toArray(), $diveNb);
-        
-        return view('dive')->with( 'dive', json_decode($data[0], true));
     }
 
     public function serializeDive($dive, $diveNb){
@@ -472,7 +280,9 @@ class DiveController extends Controller
         $result_site['longitude']   =(string)$xmldata->divesite->site->geography->longitude;
 
 
+        //TODO: check if it can be upgraded
         //get all tags values
+        $testResult = $this->test($tags, $xmldata);
         foreach ($tags as $key => $tag) {
             $tag_name = $tag["name"];
             foreach ($xmldata as $key => $level0) {
@@ -528,6 +338,7 @@ class DiveController extends Controller
             }
         }
         if ($result) {
+            //TODO: why ?
             $result['diveId'] = $dive_id["idDive"];
             return $result;
         } 
@@ -562,25 +373,24 @@ class DiveController extends Controller
 
     public function check_divesite_exist($data){
 
-        // actualy suunto has no information about diving site in the export.
+        // Because Suunto has no information about diving site in the export.
         if ($data["latitude"] == "") {
             return array('success' => true, 'idDiveSite' => 0);
         }
 
-        $site = DB::table('diveSites')
+        $site = DB::table('divesites')
         ->selectRaw('
-            diveSites.idDiveSite,
-            ( 6371000 * acos( cos( radians('.$data['latitude'].') ) * cos( radians( divesites.latitude ) ) * cos( radians( divesites.longitude ) - radians('.$data['longitude'].') ) + sin( radians('.$data['latitude'].') ) * sin(radians(divesites.latitude)) ) ) AS distance 
+            divesites.idDiveSite,
+            ( '.EARTH_RADIUS.' * acos( cos( radians('.$data['latitude'].') ) * cos( radians( divesites.latitude ) ) * cos( radians( divesites.longitude ) - radians('.$data['longitude'].') ) + sin( radians('.$data['latitude'].') ) * sin(radians(divesites.latitude)) ) ) AS distance 
         ')
         ->orderBy('distance', 'ASC')
-        ->havingRaw('distance < 200')
+        ->havingRaw('distance <'.SEARCH_RADIUS)
         ->first();
 
         if (!$site) {
             return $this->insert_diveSite($data);
-        }else{
-            return array('success' => true, 'idDiveSite' => $site->idDiveSite);
         }
+        return array('success' => true, 'idDiveSite' => $site->idDiveSite);
         
     }
 
@@ -607,6 +417,7 @@ class DiveController extends Controller
         return array('success' => $result);
     }
 
+    //TODO: watch for upgrade 1
     public function suunto($string){
         $xmldata = simplexml_load_string($string);
         $defaultFile = Storage::get('public/default/default.uddf');
@@ -636,7 +447,7 @@ class DiveController extends Controller
         return $xmlDefault;
 
     }
-
+    //TODO: watch for upgrade 2
     public function aeris($string){
         $data = explode(PHP_EOL, $string);
         $defaultFile = Storage::get('public/default/default.uddf');
@@ -654,7 +465,7 @@ class DiveController extends Controller
         $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->tankdata->tankpressurebegin = explode(": ", $data[13])[1];
         $xmlDefault->profiledata->repetitiongroup->dive->informationbeforedive->tankdata->breathingconsumptionvolume = explode(" ", $data[14])[2];
 
-        $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->greatestdepth = (explode(" ", $data[8])[2]/3.2808);//TODO check formula
+        $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->greatestdepth = (explode(" ", $data[8])[2]/3.2808);//TODO check formula and watch for const
         $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->averagedepth;
 
         $xmlDefault->profiledata->repetitiongroup->dive->informationafterdive->diveduration = ($timeEx[1]*60+$timeEx[2]);
@@ -699,5 +510,47 @@ class DiveController extends Controller
 		setlocale(LC_TIME, 'fr_FR.utf8','fra');
         $humanDate = strftime("%A %d %B %Y",mktime(0,0,0,$date[1],$date[2],$date[0]));
         return $humanDate;
+    }
+
+    //TODO: try to replace the tag reading in UDDF()
+    public function test($tags, $xml){
+        
+        $device = array();
+
+        try{
+            foreach($xml as $level0)
+            {
+                foreach($level0 as $key => $level1)
+                {
+                    $test = $level1;
+                    try{
+                        foreach($level1 as $key => $level2){
+                            $test = $level2;
+                            try{
+                                foreach($level1 as $key => $level2){
+                                    $test = $level2;
+                                    try{
+                                        foreach($level2 as $key => $level3){
+                                            $test = $level3;
+                                        }
+                                    }catch(exception $e){
+                                        //read data
+                                    }
+                                }
+                            }catch(exception $e){
+                                //read data
+                            }
+                        }
+                    }catch(exception $e){
+                        //read data
+                    }
+                }
+
+                $devices[] = $device;
+            }
+        }
+        finally {
+            echo "Et finalement...";
+        }
     }
 }

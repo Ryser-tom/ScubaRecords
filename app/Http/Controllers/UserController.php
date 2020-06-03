@@ -20,64 +20,27 @@ use DB;
 
 class UserController extends Controller
 {
-    public function index(){
-        return json_encode(User::all());
-    }
  
-    public function show($user){
+    public function show($userName){
         $userAuth = Auth::user();
 
-        $user = json_decode(User::where('name', $user)->first()->toJson(), true);
+        $user = new User;
+        // send and array with the username for ->whereIn
+        $user = $user->getUserInfosByName(explode(' ', $userName))[0];
 
-        $following = DB::table('following')
-        ->select('*')
-        ->where('idFollower', $userAuth->idUser)
-        ->where('idFollowed', $user["idUser"])
-        ->get();
-        if ($following->first()) {
-            $user['followed'] = true;
-        }else{
-            $user['followed'] = false;
-        }
+        $follow = new Follow;
+        $user['follow'] = $follow->followStatus($userAuth->idUser, $user['idUser']);
         return view('profile')->with( 'info', $user);
 
     }
 
-    public function store(Request $request){
-        $user = User::create($request->all());
-
-        return response()->json($user, 201);
-    }
-
-    public function delete(User $user){
-        $user->delete();
-
-        return response()->json(null, 204);
-    }
-
-    public function getMembers($club){
-        $userAuth = Auth::user();
-
-        $members = DB::table('users')
-        ->join('members', 'members.idUser', '=', 'users.idUser')
-        ->join('clubs', 'members.idClub', '=', 'clubs.idClub')
-        ->select('users.idUser', 'users.firstName', 'users.lastName', 'clubs.name')
-        ->where('clubs.idClub', $club)
-        ->get();
-        
-        return $members->toJson(JSON_PRETTY_PRINT);
-    }
-
-    // if possible change to ajax
+    // update the "follow" status 
     public function follow(Request $request){
         
         $userAuth = Auth::user();
-
-        $result = DB::table('following')
-        ->select('*')
-        ->where('idFollowed', $_REQUEST["followed"])
-        ->where('idFollower', $userAuth->idUser)
-        ->first();
+        
+        $follow = new Follow;
+        $result = $follow->followStatus($userAuth->idUser, $_REQUEST["followed"]);
 
         if (is_null($result)) {
             $follow = new Follow();
@@ -85,9 +48,7 @@ class UserController extends Controller
             $follow->idFollower = $userAuth->idUser;
             $follow->save();
         }else{
-            $deletedRows = Follow::where('idFollowed', $_REQUEST["followed"])
-            ->where('idFollower', $userAuth->idUser)
-            ->delete();
+            $follow->unfollow($userAuth->idUser, $_REQUEST["followed"]);
         }
 
         return redirect('/user/'.$_REQUEST["name"]);
@@ -96,24 +57,17 @@ class UserController extends Controller
     public function showUpdate(){
         $userAuth = Auth::user();
 
-        $user = DB::table('users')
-            ->select('*')
-            ->where('users.idUser', $userAuth->idUser)
-            ->get();
-        $dataUpdate = json_decode(json_encode($user->toArray()), true);
+        $user = new User;
+        $user = $user->getUserInfosById(explode(' ', $userAuth->idUser));
+        $dataUpdate = $user;
         return view('userUpdate')->with( 'data', $dataUpdate[0]);
     }
 
     public function update(){
-        $user = Auth::user();
-        
-        $user = User::find($user->idUser);
-        $user->name= $_POST["name"];
-        $user->email= $_POST["email"];
-        $user->phone= $_POST["phone"];
-        $user->smallDesc= $_POST["smallDesc"];
-        $user->description= $_POST["description"];
-        $user->save();
+        $userAuth = Auth::user();
+
+        $user = new User;
+        $user->updateInfo($_POST, $userAuth->idUser);
 
         return redirect()->route('showUser', array('username' => $_POST["name"]));
     }

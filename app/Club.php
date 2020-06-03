@@ -11,6 +11,7 @@ VERSION     : 1.0
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
 class Club extends Model
 {
@@ -29,4 +30,22 @@ class Club extends Model
         'startDateTime',
         'endDateTime'
     ];
+
+    public function getAllClubsOfUser($user){
+        $clubs = DB::table('clubs')
+        ->select('*')
+        ->join('members', 'members.idClub', '=', 'clubs.idClub')
+        ->where('members.idUser', $user)
+        ->get();
+        return $clubs;
+    }
+
+    public function getClubInfo($club){
+        $clubInfos = DB::table('clubs')
+            ->select('*')
+            ->where('clubs.name', $club)
+            ->get();
+        $data = json_decode(json_encode($clubInfos->toArray()), true);
+        return $data;
+    }
 }

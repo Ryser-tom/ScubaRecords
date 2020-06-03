@@ -14,6 +14,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use DB;
 
 //class User extends Authenticatable
 //{
@@ -52,4 +53,31 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token', 'api_token'
     ];
+
+    //TODO: get rid of the encode-Decode
+    public function getUserInfosById($idUser){
+        $user = DB::table('users')
+            ->select('*')
+            ->whereIn('users.idUser', $idUser)
+            ->get();
+        return json_decode(json_encode($user->toArray()), true);
+    }
+
+    public function getUserInfosByName($name){
+        $user = DB::table('users')
+            ->select('*')
+            ->whereIn('users.name', $name)
+            ->get();
+        return json_decode(json_encode($user), true);
+    }
+
+    public function updateInfo($data, $idUser){
+        $user = User::find($idUser);
+        $user->name= $data["name"];
+        $user->email= $data["email"];
+        $user->phone= $data["phone"];
+        $user->smallDesc= $data["smallDesc"];
+        $user->description= $data["description"];
+        $user->save();
+    }
 }
