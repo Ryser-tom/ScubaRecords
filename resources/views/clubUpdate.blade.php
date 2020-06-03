@@ -10,7 +10,7 @@ VERSION     : 1.0
 
 @section('content')
 	@php
-		xdebug_break();
+		//xdebug_break();
 
 	@endphp
     @if(!isset($data[0]["endDateTime"]))
@@ -47,7 +47,7 @@ VERSION     : 1.0
                     <div class="col-md-6">
                     @if(isset($data))
                         <fieldset>
-                            <!-- Form Name -->
+                            <!-- TODO: make the member gestion -->
                             <legend>Gestion des membres</legend>
                             <table class="table">
                                 <thead>
@@ -87,6 +87,7 @@ VERSION     : 1.0
                     <div class="col-md-12">
                         {{csrf_field()}}
                         {{ Form::hidden('master', $data[0]["master"] ?? Auth::user()->idUser) }}
+                        {{ Form::hidden('clubName', $data[0]["name"])}}
                         @if(isset($data))
                             {{ Form::hidden('idClub', $data[0]["idClub"])}}
                         @else

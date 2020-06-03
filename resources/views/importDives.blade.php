@@ -14,7 +14,7 @@ VERSION     : 1.0
 		
 	</style>
 	@php
-		xdebug_break();
+		//xdebug_break();
 	@endphp
 	<div class="container">
 		<form action="/uploadDive" method="post" enctype="multipart/form-data">

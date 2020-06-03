@@ -4,6 +4,7 @@ LIEU        : CFPT Informatique Genève
 DATE        : Avril 2020
 TITRE PROJET: ScubaRecords
 VERSION     : 1.0
+TODO: correct gaz mix (hidden when all data)
 ******************************************************************************-->
 
 @extends('layouts.app')
@@ -53,7 +54,7 @@ VERSION     : 1.0
 	</style>
 
 	@php
-		xdebug_break();
+		//xdebug_break();
 		$dive = $data[0];
 	@endphp
     <div class="container">

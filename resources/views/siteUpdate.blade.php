@@ -10,7 +10,7 @@ VERSION     : 1.0
 
 @section('content')
 	@php
-		xdebug_break();
+		//xdebug_break();
 
 	@endphp
         <div class="container">

@@ -10,7 +10,7 @@ VERSION     : 1.0
 
 @section('content')
 	@php
-		xdebug_break();
+		//xdebug_break();
 
         if(isset($data[0]["datetime"])){
 			$dateTime = preg_split('/[-T]/',  $data[0]["datetime"]);
@@ -149,7 +149,7 @@ VERSION     : 1.0
                     <div class="form-group row">
                         <label for="depth" class="col-2 col-form-label">Profondeur max. (m)</label>
                         <div class="col-10">
-                            <input class="form-control" type="number" value='{{$data[0]["greatestdepth"]}}' id="depth" name="depth">
+                            <input class="form-control" type="number" value='{{$data[0]["greatestdepth"] ?? ""}}' id="depth" name="depth">
                         </div>
                     </div>
                 </fieldset>

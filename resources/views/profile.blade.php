@@ -61,7 +61,7 @@ VERSION     : 1.0
 		}
 	</style>
 	@php
-		xdebug_break();
+		//xdebug_break();
 	@endphp
     <div class="main main-raised">
 		<div class="profile-content">
@@ -77,7 +77,7 @@ VERSION     : 1.0
 								{{csrf_field()}}
 								{{ Form::hidden('followed', $info['idUser']) }}
 								{{ Form::hidden('name', $info['name']) }}
-								@if($info['followed'])
+								@if(!is_null($info['follow']))
 									<button class="btn btn-danger" type="submit">Ne plus suivre</button>
 								@else
 									<button class="btn btn-success" type="submit">Suivre</button>
@@ -90,6 +90,7 @@ VERSION     : 1.0
 								<form action="/membership" method="post">
 									{{csrf_field()}}
 									{{ Form::hidden('club', $info['idClub']) }}
+									{{ Form::hidden('clubName', $info["name"])}}
 									<!-- TODO: finish the membership -->
 									@if($info['member'])
 										<button class="btn btn-danger" type="submit">Ne plus suivre</button>
@@ -112,6 +113,7 @@ VERSION     : 1.0
 							@if(isset($info['idUser'])) 
 								Binome
 							@else
+								<!-- TODO: show members -->
 								Membres
 							@endif	
 						</a></p>
@@ -149,31 +151,4 @@ VERSION     : 1.0
 					</div>
 				</div>
             </div>
-			<script>
-				$(document).ready(function() { 
-					$("#btn-follow").click(function() { 
-						$.ajaxSetup({ 
-							headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')} 
-						});
-						$.ajax({
-							type: 'POST', url: '/tasks', data: {
-								task: $("#frmAddTask input[name=task]").val(),
-								description: $("#frmAddTask input[name=description]").val(),
-							},
-							dataType: 'json', success: function(data) { 
-								$('#frmAddTask').trigger("reset");
-								$("#frmAddTask .close").click(); 
-								window.location.reload(); 
-							}, 
-							error: function(data) { 
-								var errors = $.parseJSON(data.responseText); 
-								$('#add-task-errors').html(''); 
-								$.each(errors.messages, function(key, value) { 
-									$('#add-task-errors').append('<li>' + value + '</li>'); 
-								}); 
-								$("#add-error-bag").show(); 
-							} 
-						}); 
-					});
-			</script>
 @endsection

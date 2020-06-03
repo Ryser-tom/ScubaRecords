@@ -59,7 +59,7 @@ VERSION     : 1.0
 		}
 	</style>
 	@php
-		xdebug_break();
+		//xdebug_break();
 	@endphp
 	<div class="container">
 		<div class="table-responsive">

@@ -10,7 +10,7 @@ VERSION     : 1.0
 
 @section('content')
 	@php
-		xdebug_break();
+		//xdebug_break();
 
 		function compare_datetime($a, $b){
 			return strnatcmp(!$a['datetime'], $b['datetime']);
